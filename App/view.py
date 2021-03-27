@@ -53,7 +53,7 @@ while True:
         catalog = initCatalog()
     elif int(inputs[0]) == 2:
         print('Cargando informacion.....')
-        controller.loadData(catalog)
+        controller.loadData(catalog, 375943)
         print('Videos Cargados: '+ str(controller.videosSize(catalog)))
         print('Categorias Cargadas: ' + str(controller.categoriesSize(catalog)))
     else:

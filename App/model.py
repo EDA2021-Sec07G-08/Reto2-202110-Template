@@ -39,7 +39,6 @@ los mismos.
 
 # Construccion de modelos
 
-# Funciones para agregar informacion al catalogo
 
 def newCatalog():
     """ Inicializa el catálogo de libros
@@ -55,10 +54,8 @@ def newCatalog():
     Retorna el catalogo inicializado.
     """
     catalog = {'videos': None,
-                'videos_id': None,
-                'categoryIds': None,
-                'tags': None,
-                'tagIds' : None}
+                'videos_by_id': None,
+                'videos_by_category_ids': None}
 
     """
     Esta lista contiene todo los libros encontrados
@@ -66,48 +63,45 @@ def newCatalog():
     ordenados por ningun criterio.  Son referenciados
     por los indices creados a continuacion.
     """
-    catalog['videos'] = lt.newList('SINGLE_LINKED', compareVideosIds)
+    catalog['videos'] = lt.newList('ARRAY_LIST', compareVideosIds)
 
-    catalog['videos_id'] = mp.newMap(10000,
-                                    maptype = 'CHAINING',
-                                    loadfactor=4.0,
-                                    comparefunction=compareMapVideosIds)
+    catalog['videos_by_id'] = mp.newMap(375943, maptype='PROBING', loadfactor=0.5, comparefunction=compareVideosIds)
 
-    catalog['categoryIds'] = mp.newMap(49,
-                                   maptype='CHAINING',
-                                   loadfactor=4.0,
-                                   comparefunction=compareVideosByCategory)
+    catalog['videos_by_category_ids'] = mp.newMap(37, maptype='CHAINING', loadfactor = 4.0, comparefunction = compareVideosByCategory)
 
     return catalog
 
-# Funciones para creacion de datos
-
-def newCategory(name):
-    category = {'name' : "",
-                'videos' : None}
-    category['name'] = name
-    category['videos'] = lt.newList('SINGLE_LINKED', compareVideosByCategory)
+# Funciones para agregar informacion al catalogo
 
 def addVideo(catalog, video):
 
     lt.addLast(catalog['videos'], video)
-    mp.put(catalog['categoryIds'], video['title'], video)
-    categories = video['category_id']
-    for category in categories:
-        addCategoryVideo(catalog, category, video)
+    mp.put(catalog['videos_by_id'], video['video_id'], video)
+    addCategoryVideo(catalog, video)
 
-def addCategoryVideo(catalog, category_name, video):
-    categories = catalog['category_id']
-    existcategory = mp.contains(categories, category_name)
-    if existcategory:
-        entry = mp.get(categories, category_name)
-        category = me.getValue(entry)
-    else:
-        category = newCategory(category_name)
-        mp.put(categories, category_name, category)
+def addCategoryVideo(catalog, video):
 
-    lt.addLast(category['video'], video)
+    categories = catalog['videos_by_category_ids']
+    category_id = video['category_id']
+    entrada = mp.get(categories, category_id)
+    videos_cat = me.getValue(entrada)
+    lt.addLast(videos_cat['videos'], video)
 
+def addCategory(catalog, category):
+
+    categories = catalog['videos_by_category_ids']
+    category_id = video['category_id']
+    existCate = mp.contains(categories, category_id)
+    videos_cat = newCategory(category)
+    mp.put(categories, category_id, videos_cat)
+
+def newCategory(category):
+    entrada = {'category_id': '', 'category_name': '', 'videos': None}
+    entrada['category_id'] = category['id']
+    entrada['category_name'] = category['name']
+    entrada['videos'] = lt.newList('LINKED_LIST', compareVideosByCategory)
+
+# Funciones para creacion de datos
 
 # Funciones de consulta
 
