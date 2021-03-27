@@ -23,6 +23,8 @@
 import config as cf
 import model
 import csv
+from datetime import datetime as dt
+import DISClib.ADT.list as lt
 
 
 """
@@ -37,25 +39,49 @@ def initCatalog():
 
     return catalog
 
-def loadData(catalog):
+def loadData(catalog, size):
     """
     Carga los datos de los archivos y cargar los datos en la
     estructura de datos
     """
-    loadVideos(catalog)
+    loadVideos(catalog, size)
     loadCategories(catalog)
 
-def loadVideos(catalog):
+def loadVideos(catalog, size):
     videosfile = cf.data_dir + 'videos/videos-large.csv'
     input_file = csv.DictReader(open(videosfile, encoding='utf-8'))
+    cont = 0
     for video in input_file:
-        model.addVideo(catalog, video)
+        new_video = {}
+        info = ['title', 'video_id', 'category_id', 'channel_title', 'country', 'publish_time']
+        info_2 = ['views', 'likes', 'dislikes']
+        for i in info:
+            new_video[i] = video[i]
+        for j in info_2:
+            new_video[j] = video[j]
+
+        new_video['trending_date'] = dt.strptime(video['trending_date'], '%y.%d.%m').date()
+
+        new_video['tags'] = lt.newList('ARRAY_LIST')
+
+        for tag in video['tags'].split('"|"'):
+            tag.replace('"', '')
+            lt.addLast(new_video['tags'], tag)
+
+        model.addVideo(catalog, new_video)
+        cont += 1
+        if cont >= size:
+            break
 
 def loadCategories(catalog):
     categoryfile = cf.data_dir + 'videos/category-id.csv'
     input_file = csv.DictReader(open(categoryfile, encoding='utf-8'))
-    for category in input_file:
-        model.addCategory(catalog, category)
+    for cat in input_file:
+        new_cat = {}
+        info = ['id', 'name']
+        for i in info:
+            new_cat[i] = (str(new_cat[i]).lower()).replace(' ', '')
+            model.addCategory(catalog, new_cat)
 
 # Funciones para la carga de datos
 
