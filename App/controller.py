@@ -25,6 +25,8 @@ import model
 import csv
 from datetime import datetime as dt
 import DISClib.ADT.list as lt
+import time
+import tracemalloc
 
 
 """
@@ -44,8 +46,26 @@ def loadData(catalog, size):
     Carga los datos de los archivos y cargar los datos en la
     estructura de datos
     """
-    loadVideos(catalog, size)
+
+    delta_time = -1.0
+    delta_memory = -1.0
+
+    tracemalloc.start()
+    start_time = getTime()
+    start_memory = getMemory()
+
     loadCategories(catalog)
+    loadVideos(catalog, size)
+
+    stop_memory = getMemory()
+    stop_time = getTime()
+    tracemalloc.stop()
+
+    delta_time = stop_time - start_time
+    delta_memory = deltaMemory(start_memory, stop_memory)
+
+    return delta_time, delta_memory
+    
 
 def loadVideos(catalog, size):
     videosfile = cf.data_dir + 'videos/videos-large.csv'
@@ -58,7 +78,7 @@ def loadVideos(catalog, size):
         for i in info:
             new_video[i] = video[i]
         for j in info_2:
-            new_video[j] = video[j]
+            new_video[j] = int(video[j])
 
         new_video['trending_date'] = dt.strptime(video['trending_date'], '%y.%d.%m').date()
 
@@ -75,13 +95,13 @@ def loadVideos(catalog, size):
 
 def loadCategories(catalog):
     categoryfile = cf.data_dir + 'videos/category-id.csv'
-    input_file = csv.DictReader(open(categoryfile, encoding='utf-8'))
+    input_file = csv.DictReader(open(categoryfile, encoding='utf-8'), delimiter = '\t')
     for cat in input_file:
         new_cat = {}
         info = ['id', 'name']
         for i in info:
-            new_cat[i] = (str(new_cat[i]).lower()).replace(' ', '')
-            model.addCategory(catalog, new_cat)
+            new_cat[i] = (str(cat[i]).lower()).replace(' ', '')
+        model.addCategory(catalog, new_cat)
 
 # Funciones para la carga de datos
 
@@ -90,7 +110,30 @@ def loadCategories(catalog):
 # Funciones de consulta sobre el catálogo
 
 def videosSize(catalog):
+
     return model.videosSize(catalog)
 
 def categoriesSize(catalog):
+
     return model.categoriesSize(catalog)
+
+#funciones para medir tiempo y memoria
+
+def getTime():
+
+    return float(time.perf_counter()*1000)
+
+def getMemory():
+
+    return tracemalloc.take_snapshot()
+
+def deltaMemory(start_memory, stop_memory):
+
+    memory_diff = stop_memory.compare_to(start_memory, "filename")
+    delta_memory = 0.0
+
+    for stat in memory_diff:
+        delta_memory = delta_memory + stat.size_diff
+    
+    delta_memory = delta_memory/1024.0
+    return delta_memory

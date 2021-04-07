@@ -65,9 +65,9 @@ def newCatalog():
     """
     catalog['videos'] = lt.newList('ARRAY_LIST', compareVideosIds)
 
-    catalog['videos_by_id'] = mp.newMap(375943, maptype='PROBING', loadfactor=0.5, comparefunction=compareVideosIds)
+    catalog['videos_by_id'] = mp.newMap(375943, maptype='CHAINING', loadfactor=0.5, comparefunction=compareMapVideosIds)
 
-    catalog['videos_by_category_ids'] = mp.newMap(37, maptype='CHAINING', loadfactor = 4.0, comparefunction = compareVideosByCategory)
+    catalog['videos_by_category_ids'] = mp.newMap(numelements = 37, maptype='CHAINING', loadfactor = 0.5, comparefunction = compareVideosByCategory)
 
     return catalog
 
@@ -90,16 +90,19 @@ def addCategoryVideo(catalog, video):
 def addCategory(catalog, category):
 
     categories = catalog['videos_by_category_ids']
-    category_id = video['category_id']
+    category_id = category['id']
     existCate = mp.contains(categories, category_id)
-    videos_cat = newCategory(category)
-    mp.put(categories, category_id, videos_cat)
+    if not existCate:
+        videos_cat = newCategory(category)
+        mp.put(categories, category_id, videos_cat)
 
 def newCategory(category):
     entrada = {'category_id': '', 'category_name': '', 'videos': None}
     entrada['category_id'] = category['id']
     entrada['category_name'] = category['name']
     entrada['videos'] = lt.newList('LINKED_LIST', compareVideosByCategory)
+
+    return entrada
 
 # Funciones para creacion de datos
 
@@ -111,23 +114,23 @@ def videosSize(catalog):
 
 def categoriesSize(catalog):
 
-    return lt.size(catalog['categoryIds'])
+    return mp.size(catalog['videos_by_category_ids'])
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 
-def compareVideosIds(id1, id2):
-    if(id1 == id2):
+def compareVideosIds(video1, video2):
+    if video1 == video2['key']:
         return 0
-    elif id1 > id2:
+    elif video1 > video2['key']:
         return 1
     else: 
         return -1
 
 def compareMapVideosIds(id, entrada):
     identidad = me.getKey(entrada)
-    if(id1 == entrada):
+    if(id == identidad):
         return 0
-    elif(id1 > entrada):
+    elif(id > identidad):
         return 1
     else:
         return -1

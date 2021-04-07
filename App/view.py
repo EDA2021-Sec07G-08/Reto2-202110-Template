@@ -53,9 +53,11 @@ while True:
         catalog = initCatalog()
     elif int(inputs[0]) == 2:
         print('Cargando informacion.....')
-        controller.loadData(catalog, 375943)
+        answer = controller.loadData(catalog, 200000)
         print('Videos Cargados: '+ str(controller.videosSize(catalog)))
-        print('Categorias Cargadas: ' + str(controller.categoriesSize(catalog)))
+        print('Categorias Cargadas: '+ str(controller.categoriesSize(catalog)))
+        print('Tiempo[ms]: '+ f"{answer[0]:.3f}", " || ",
+              "Memoria[kb]: "+ f"{answer[1]:.3f}")
     else:
         sys.exit(0)
 sys.exit(0)
