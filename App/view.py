@@ -38,6 +38,7 @@ def printMenu():
     print("Bienvenido")
     print("1- Inicializar Catalogo")
     print("2- Cargar datos al catalogo")
+    print("3- Requerimiento 3")
 
 catalog = None
 
@@ -53,11 +54,15 @@ while True:
         catalog = initCatalog()
     elif int(inputs[0]) == 2:
         print('Cargando informacion.....')
-        answer = controller.loadData(catalog, 200000)
+        answer = controller.loadData(catalog, 375943)
         print('Videos Cargados: '+ str(controller.videosSize(catalog)))
         print('Categorias Cargadas: '+ str(controller.categoriesSize(catalog)))
-        print('Tiempo[ms]: '+ f"{answer[0]:.3f}", " || ",
-              "Memoria[kb]: "+ f"{answer[1]:.3f}")
+
+    elif int(inputs[0]) == 3:
+        category_name = input('Ingrese el nombre de la categoria: ')
+        print('Ejecutando requerimiento 3')
+        ans = controller.requerimiento3(catalog, category_name)
+        print(ans)
     else:
         sys.exit(0)
 sys.exit(0)

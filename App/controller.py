@@ -46,25 +46,10 @@ def loadData(catalog, size):
     Carga los datos de los archivos y cargar los datos en la
     estructura de datos
     """
-
-    delta_time = -1.0
-    delta_memory = -1.0
-
-    tracemalloc.start()
-    start_time = getTime()
-    start_memory = getMemory()
-
     loadCategories(catalog)
     loadVideos(catalog, size)
 
-    stop_memory = getMemory()
-    stop_time = getTime()
-    tracemalloc.stop()
 
-    delta_time = stop_time - start_time
-    delta_memory = deltaMemory(start_memory, stop_memory)
-
-    return delta_time, delta_memory
     
 
 def loadVideos(catalog, size):
@@ -103,6 +88,7 @@ def loadCategories(catalog):
             new_cat[i] = (str(cat[i]).lower()).replace(' ', '')
         model.addCategory(catalog, new_cat)
 
+
 # Funciones para la carga de datos
 
 # Funciones de ordenamiento
@@ -137,3 +123,7 @@ def deltaMemory(start_memory, stop_memory):
     
     delta_memory = delta_memory/1024.0
     return delta_memory
+
+def requerimiento3(catalog, category_name):
+
+    return model.requerimiento3(catalog, category_name)

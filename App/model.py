@@ -65,9 +65,9 @@ def newCatalog():
     """
     catalog['videos'] = lt.newList('ARRAY_LIST', compareVideosIds)
 
-    catalog['videos_by_id'] = mp.newMap(375943, maptype='CHAINING', loadfactor=0.5, comparefunction=compareMapVideosIds)
+    catalog['videos_by_id'] = mp.newMap(375943, maptype='CHAINING', loadfactor=6.0, comparefunction=compareMapVideosIds)
 
-    catalog['videos_by_category_ids'] = mp.newMap(numelements = 37, maptype='CHAINING', loadfactor = 0.5, comparefunction = compareVideosByCategory)
+    catalog['videos_by_category_ids'] = mp.newMap(numelements = 37, maptype='CHAINING', loadfactor = 6.0, comparefunction = compareVideosIds)
 
     return catalog
 
@@ -104,6 +104,7 @@ def newCategory(category):
 
     return entrada
 
+
 # Funciones para creacion de datos
 
 # Funciones de consulta
@@ -135,14 +136,78 @@ def compareMapVideosIds(id, entrada):
     else:
         return -1
 
-def compareVideosByCategory(keyname, category):
-    catentry = me.getKey(category)
-    if (keyname == catentry):
+def compareVideosByCategory(keyname, entry):
+    catentry = me.getKey(entry)
+    if keyname == catentry:
         return 0
-    elif (keyname > catentry):
+    elif keyname > catentry:
+        return 1
+    else:
+        return -1
+
+def compareVideosByCountry(keyname, country):
+    countentry = me.getKey(country)
+    if keyname == countentry:
+        return 0
+    elif keyname > countentry:
         return 1
     else:
         return -1
 
 
 # Funciones de ordenamiento
+
+def buscarCate(catalog, category_name):
+
+    keys = mp.keySet(catalog['videos_by_category_ids'])
+
+    for key in range(lt.size(keys)):
+
+        pos = lt.getElement(keys, key)
+        key_value = mp.get(catalog['videos_by_category_ids'], pos)
+        value = me.getValue(key_value)
+        cat_name = value['category_name']
+        if cat_name == category_name:
+            return value['category_id']
+
+def requerimiento3(catalog, category_name):
+
+    category_id = buscarCate(catalog, category_name)
+
+    key_value = mp.get(catalog['videos_by_category_ids'], category_id)
+    videos = me.getValue(key_value)['videos']
+
+    retorno = mp.newMap()
+
+    for i in range(lt.size(videos)):
+
+        video = lt.getElement(videos, i)
+        exists = mp.contains(retorno, video['title'])
+        if exists:
+            valores = mp.get(retorno, video['title'])
+            valor = me.getValue(valores)
+            valor['trending_dates'] += 1
+        else:
+            dicc = {}
+            dicc['channel_title'] = video['channel_title']
+            dicc['category_id'] = category_id
+            dicc['trending_dates'] = 1
+            mp.put(retorno, video['title'], dicc)
+
+    temp = mp.keySet(retorno)
+
+    mayor_num = 0
+    mayor_dict = 0
+
+    for i in range(lt.size(temp)):
+
+        key = lt.getElement(temp, i)
+        trendings = mp.get(retorno, key)
+        values = me.getValue(trendings)
+        num = values['trending_dates']
+        if mayor_num < num:
+            mayor_dict = values
+
+    return values
+        
+
