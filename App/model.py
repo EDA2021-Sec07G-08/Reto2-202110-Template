@@ -1,4 +1,4 @@
-﻿"""
+"""
  * Copyright 2020, Departamento de sistemas y Computación,
  * Universidad de Los Andes
  *
@@ -205,9 +205,10 @@ def requerimiento3(catalog, category_name):
         trendings = mp.get(retorno, key)
         values = me.getValue(trendings)
         num = values['trending_dates']
-        if mayor_num < num:
+        if num > mayor_num:
+            mayor_num = num
             mayor_dict = values
 
-    return values
+    return mayor_dict
         
 
