@@ -123,6 +123,9 @@ def deltaMemory(start_memory, stop_memory):
     
     delta_memory = delta_memory/1024.0
     return delta_memory
+    
+def Requerimiento2 (catalog,country):
+    return model.Requerimiento2(catalog,country)
 
 def requerimiento3(catalog, category_name):
 

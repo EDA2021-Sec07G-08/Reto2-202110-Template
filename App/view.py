@@ -38,8 +38,9 @@ def printMenu():
     print("Bienvenido")
     print("1- Inicializar Catalogo")
     print("2- Cargar datos al catalogo")
-    print("3- Requerimiento 3")
-
+    
+    print("4- Requerimiento 2")
+    print("5- Requerimiento 3")
 catalog = None
 
 def initCatalog():
@@ -58,7 +59,13 @@ while True:
         print('Videos Cargados: '+ str(controller.videosSize(catalog)))
         print('Categorias Cargadas: '+ str(controller.categoriesSize(catalog)))
 
-    elif int(inputs[0]) == 3:
+    elif int(inputs[0]) == 4:
+        x = input("Ingrese el país ")
+        print(x)
+        answer = controller.Requerimiento2(catalog,x.lower())
+        print(answer['title']," " *10 ,answer['channel_title']," " *10 ,answer['country']," " *10 ,answer['trending_days'])
+   
+    elif int(inputs[0]) == 5:
         category_name = input('Ingrese el nombre de la categoria: ')
         print('Ejecutando requerimiento 3')
         ans = controller.requerimiento3(catalog, category_name)
