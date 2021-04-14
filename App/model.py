@@ -69,7 +69,7 @@ def newCatalog():
 
     catalog['videos_by_id'] = mp.newMap(375943, maptype='CHAINING', loadfactor=6.0, comparefunction=compareMapVideosIds)
 
-    catalog['videos_by_category_ids'] = mp.newMap(numelements = 37, maptype='CHAINING', loadfactor = 6.0, comparefunction = compareVideosIds)
+    catalog['videos_by_category_ids'] = mp.newMap(numelements = 37, maptype='CHAINING', loadfactor = 6.0, comparefunction = compareMapVideosIds)
 
     catalog['videos_by_country'] = mp.newMap(numelements = 37, maptype = 'CHAINING', loadfactor = 2.0, comparefunction = compareMapVideosIds)
 
@@ -132,6 +132,10 @@ def categoriesSize(catalog):
 
     return mp.size(catalog['videos_by_category_ids'])
 
+def countriesSize(catalog):
+
+    return mp.size(catalog['videos_by_country'])
+
 # Funciones utilizadas para comparar elementos dentro de una lista
 
 def compareVideosIds(video1, video2):
@@ -190,6 +194,52 @@ def buscarCate(catalog, category_name):
         cat_name = value['category_name']
         if cat_name == category_name:
             return value['category_id']
+
+def requerimiento1(catalog, category_name, country, num_vids):
+
+    category_id = buscarCate(catalog, category_name)
+
+    key_value = mp.get(catalog['videos_by_category_ids'], category_id)
+    videos = me.getValue(key_value)['videos']
+
+    final = mp.newMap()
+
+    lista_desordenada = lt.newList(datastructure='ARRAY_LIST')
+
+    for i in range(lt.size(videos)):
+
+        video = lt.getElement(videos, i)
+        pais = video['country']
+
+        if pais == country:
+            exists = mp.contains(final,int(video['likes']))
+
+            if not exists: 
+                dicc = {}
+                likes = int(video['likes'])
+                dicc['trending_date'] = video['trending_date']
+                dicc['title'] = video['title']
+                dicc['channel_title'] = video['channel_title']
+                dicc['publish_time'] = video['publish_time']
+                dicc['views'] = video['views']
+                dicc['likes'] = video['likes']
+                dicc['dislikes'] = video['dislikes']
+                mp.put(final, likes, dicc)
+                lt.addLast(lista_desordenada, int(video['likes']))        
+
+    lista_ordenada = mgs.sort(lista_desordenada, compararViews)
+
+    list_final = lt.subList(lista_ordenada, 1, int(num_vids))
+
+    lista_videos = lt.newList()
+
+    for i in range(lt.size(list_final)):
+        num_likes = lt.getElement(list_final, i)
+        diccionario = mp.get(final, int(num_likes))
+        ans = me.getValue(diccionario)
+        print(ans)
+
+
 
 def Requerimiento2(catalog,country) :
     videos = mp.get(catalog['videos_by_country'],country)
@@ -294,11 +344,7 @@ def requerimiento4(catalog, country, tag, num_vids):
 
     lista_ordenada = mgs.sort(lista_desordenada, compararViews)
 
-    print(lista_ordenada)
-
     list_final = lt.subList(lista_ordenada, 1, int(num_vids))
-
-    print(list_final)
 
     lista_videos = lt.newList()
 

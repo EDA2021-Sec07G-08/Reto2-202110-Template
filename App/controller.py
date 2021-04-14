@@ -104,6 +104,10 @@ def categoriesSize(catalog):
 
     return model.categoriesSize(catalog)
 
+def countriesSize(catalog):
+
+    return model.countriesSize(catalog)
+
 #funciones para medir tiempo y memoria
 
 def getTime():
@@ -124,6 +128,10 @@ def deltaMemory(start_memory, stop_memory):
     
     delta_memory = delta_memory/1024.0
     return delta_memory
+
+def requerimiento1(catalog, category_name, country, num_vids):
+
+    return model.requerimiento1(catalog, category_name, country, num_vids)
     
 def Requerimiento2 (catalog,country):
     return model.Requerimiento2(catalog,country)
