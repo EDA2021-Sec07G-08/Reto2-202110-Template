@@ -67,11 +67,12 @@ def loadVideos(catalog, size):
 
         new_video['trending_date'] = dt.strptime(video['trending_date'], '%y.%d.%m').date()
 
-        new_video['tags'] = lt.newList('ARRAY_LIST')
+        new_video['tags'] = []
 
-        for tag in video['tags'].split('"|"'):
+        for tag in str(video['tags']).split('"|"'):
             tag.replace('"', '')
-            lt.addLast(new_video['tags'], tag)
+            tag.lower()
+            new_video['tags'].append(tag)
 
         model.addVideo(catalog, new_video)
         cont += 1
@@ -130,3 +131,7 @@ def Requerimiento2 (catalog,country):
 def requerimiento3(catalog, category_name):
 
     return model.requerimiento3(catalog, category_name)
+
+def requerimiento4(catalog, country, tag, num_vids):
+
+    return model.requerimiento4(catalog, country, tag, num_vids)

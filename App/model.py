@@ -31,6 +31,7 @@ from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
 assert cf
+from DISClib.Algorithms.Sorting import mergesort as mgs
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
@@ -168,6 +169,12 @@ def compareVideosByCountry(keyname, country):
     else:
         return -1
 
+def compararViews(n1, n2):
+
+    return n1 > n2
+
+
+
 
 # Funciones de ordenamiento
 
@@ -232,6 +239,7 @@ def requerimiento3(catalog, category_name):
             valor['trending_dates'] += 1
         else:
             dicc = {}
+            dicc['title'] = video['title']
             dicc['channel_title'] = video['channel_title']
             dicc['category_id'] = category_id
             dicc['trending_dates'] = 1
@@ -254,4 +262,50 @@ def requerimiento3(catalog, category_name):
 
     return mayor_dict
         
+def requerimiento4(catalog, country, tag, num_vids):
+
+    videos = mp.get(catalog['videos_by_country'],country)
+    videos = me.getValue(videos)
+    final = mp.newMap()
+
+    lista_desordenada = lt.newList(datastructure='ARRAY_LIST')
+
+    for i in range(lt.size(videos)):
+
+        video = lt.getElement(videos, i)
+        tags = video['tags']
+
+        for i in range(len(tags)):
+            if tags[i] == tag:
+                exists = mp.contains(final,int(video['likes']))
+
+                if not exists: 
+                    dicc = {}
+                    likes = int(video['likes'])
+                    dicc['title'] = video['title']
+                    dicc['channel_title'] = video['channel_title']
+                    dicc['publish_time'] = video['publish_time']
+                    dicc['views'] = video['views']
+                    dicc['likes'] = video['likes']
+                    dicc['dislikes'] = video['dislikes']
+                    dicc['tags'] = video['tags']
+                    mp.put(final, likes, dicc)
+                    lt.addLast(lista_desordenada, int(video['likes']))        
+
+    lista_ordenada = mgs.sort(lista_desordenada, compararViews)
+
+    print(lista_ordenada)
+
+    list_final = lt.subList(lista_ordenada, 1, int(num_vids))
+
+    print(list_final)
+
+    lista_videos = lt.newList()
+
+    for i in range(lt.size(list_final)):
+        num_likes = lt.getElement(list_final, i)
+        diccionario = mp.get(final, int(num_likes))
+        ans = me.getValue(diccionario)
+        print(ans)
+
 

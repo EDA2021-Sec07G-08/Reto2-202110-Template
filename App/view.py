@@ -41,6 +41,7 @@ def printMenu():
     
     print("4- Requerimiento 2")
     print("5- Requerimiento 3")
+    print("6- Requerimiento 4")
 catalog = None
 
 def initCatalog():
@@ -70,6 +71,12 @@ while True:
         print('Ejecutando requerimiento 3')
         ans = controller.requerimiento3(catalog, category_name)
         print(ans)
-    else:
+    
+    elif int(inputs[0]) == 6:
+        tag = input('Ingrese el tag: ')
+        tag = tag.lower()
+        country = input('Ingrese el pais: ')
+        num_vids = input('Ingrese el numero de videos: ')
+        controller.requerimiento4(catalog, country, tag, num_vids)
         sys.exit(0)
 sys.exit(0)
