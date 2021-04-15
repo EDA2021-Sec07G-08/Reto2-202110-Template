@@ -33,6 +33,7 @@ from DISClib.Algorithms.Sorting import shellsort as sa
 assert cf
 from DISClib.Algorithms.Sorting import mergesort as mgs
 
+
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
 los mismos.
@@ -242,6 +243,7 @@ def requerimiento1(catalog, category_name, country, num_vids):
 
 
 def Requerimiento2(catalog,country) :
+
     videos = mp.get(catalog['videos_by_country'],country)
     videos = me.getValue(videos)
     retorno = mp.newMap(comparefunction = compareMapVideosIds)
@@ -268,6 +270,7 @@ def Requerimiento2(catalog,country) :
         if video['trending_days']  > mayor:
             mayor = video['trending_days']
             mayor1 = video 
+
     return mayor1 
 
 def requerimiento3(catalog, category_name):
@@ -314,6 +317,7 @@ def requerimiento3(catalog, category_name):
         
 def requerimiento4(catalog, country, tag, num_vids):
 
+
     videos = mp.get(catalog['videos_by_country'],country)
     videos = me.getValue(videos)
     final = mp.newMap()
@@ -353,5 +357,6 @@ def requerimiento4(catalog, country, tag, num_vids):
         diccionario = mp.get(final, int(num_likes))
         ans = me.getValue(diccionario)
         print(ans)
+
 
 
